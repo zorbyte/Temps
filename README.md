@@ -36,8 +36,8 @@ module.exports = async (req, res) => {
 
 Make sure to use the `main` field in your `package.json` to point to an entry point file that matches the signature of the example above.
 
-The dependency micro is injected therefore `require("micro")` will simply just work.
-If you specify a custom version in your `package.json` it will be respected. However, please ensure that the included version of micro is semver compliant with the one in use with this repository to prevent errors from external API changes.
+Since the dependency `micro` is injected, `require("micro")` will simply just work.
+If you specify a custom version in your `package.json` it will be respected. However, please ensure that the included version of micro is semver compliant with the major version of the one in use with this repository, to prevent errors from external API changes.
 
 ### Compiling your code
 
