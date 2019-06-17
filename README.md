@@ -13,6 +13,11 @@
 
 <br>
 
+## What can Temps do?
+
+- Temps can automatically hot swap your functions to an updated version without any dramas. This is achieved through GitHub webhooks.
+- Temps auto-scales your lambda function, whenever it detects a large amount of load in the event loop it creates a new thread to spread the load on.
+
 ## Setting up your function
 
 ### Programmatic setup
