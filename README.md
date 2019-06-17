@@ -13,18 +13,30 @@
 
 <br>
 
-## More info coming soon but...
+## Setting up your function
 
-<b>The gist of it (highly unorganised, sorry):</b>
+Temps is a breeze to setup, so easy it only needs an example:
+```js
+// An optional function (optionally async) that runs before the server listens is executed.
+exports.init = async () => {}
 
-Trigger a webhook that clones the repo code on `/.well-known/__lambda/update` (make sure to provide a security key to github and in the .env file).
-If the repo is private, supply an API key in the env file
-Works with github only right now, because of silly hard coding that needs to be fixed.
+// A required (optionally async) handler (works with export default as well).
+module.exports = async () => {
+  // Refer to https://github.com/zeit/micro for what you can do here!
+}
+```
 
-Lambda code that runs before requests is run in exports.init
+The dependency micro is injected therefore `require("micro")` will simply just work.
+If you specify a custom version in your `package.json` it will be respected. However, please ensure that the included version of micro is semver compliant with the one in use with this repository to prevent errors from external API changes.
 
-The serverless func itself is in `module.exports = (req, res) => {};`
-(This can be async, refer to the zeit/micro docs)
-The dependency micro comes included (require("micro") will just work, custom versions in package.json work too! but make sure it matches the major semver version included with ours as it may cause incompatibilities).
+## Configuring Temps
 
-Blazing fast response times, can range from 3-10ms on an old macbook air.
+### Repositories
+Temps only works with GitHub repositories momentarily due to some hard coded configurations that will be fixed soon.
+To configure temps to work with private repositories, setup a GitHub access token with the `repos` scope checked.
+Check out `.env.example` to see how to configure your repository.
+Temps works with github webhooks with plans to support more platforms in future.
+To set it up, generate a secret for example: `require("crypto").randomBytes(32).toString("base64")` and set it to the env variable named `SECRET`. Then configure a push webhook on GitHub that uses that same secret and pushes to the following endpoint: `example.com/.well-known/__lambda/update`.
+
+### Software configuration
+Refer to .env.example... it's pretty self-explanatory.
