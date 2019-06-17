@@ -17,7 +17,7 @@
 
 <b>The gist of it (highly unorganised, sorry):</b>
 
-Trigger a webhook that clones the repo code on /.well-known/__lambda/update
+Trigger a webhook that clones the repo code on `/.well-known/__lambda/update` (make sure to provide a security key to github and in the .env file).
 If the repo is private, supply an API key in the env file
 Works with github only right now, because of silly hard coding that needs to be fixed.
 
