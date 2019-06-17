@@ -41,7 +41,7 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse) {
         .update(payload)
         .digest("hex");
       const verif = crypto
-        .timingSafeEqual(Buffer.from(`sha1=${sig}`), Buffer.from(checksum as string))
+        .timingSafeEqual(Buffer.from(`sha1=${sig}`), Buffer.from(checksum as string));
       if (!verif) return send(res, 401, "Invalid signature");
       const body = JSON.parse(payload.toString());
       if (body.ref.indexOf(process.env.BRANCH) <= -1) return send(res, 403, "Invalid branch");

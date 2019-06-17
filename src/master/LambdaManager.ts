@@ -23,11 +23,7 @@ class LambdaManager {
 
   private createID() {
     let possibleID = nanoid();
-    if (this.previousID) {
-      while (possibleID === this.previousID) {
-        possibleID = nanoid();
-      }
-    }
+    while (this.previousID && possibleID === this.previousID) possibleID = nanoid();
     return possibleID;
   }
 

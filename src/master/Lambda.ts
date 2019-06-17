@@ -107,7 +107,7 @@ class Lambda {
       await execa("git", ["clone", "--single-branch", "--branch", this.branch, this.remote, this.homeDir]);
 
       // Wait until it does exist.
-      while (!await dirExists(`${this.homeDir}/.git`)) {/* noop */ };
+      while (!await dirExists(`${this.homeDir}/.git`)) { /* noop */ };
 
       // Get the package info.
       this.pkg = require(pkgDir);
@@ -136,7 +136,8 @@ class Lambda {
       debug("Installing dependencies for lambda.");
       await execa("npm", ["install"], { cwd: this.homeDir });
 
-      while (!await dirExists(`${this.homeDir}/node_modules`)) {/* Wait until modules are installed. */ };
+      // Wait until modules are installed.
+      while (!await dirExists(`${this.homeDir}/node_modules`)) { /* noop */ };
 
       // If it has a build script, run it.
       if (this.pkg.scripts && this.pkg.scripts.lambdaBuild) {
@@ -155,7 +156,7 @@ class Lambda {
     setupMaster({
       // @ts-ignore This is supported by node now.
       cwd: this.homeDir,
-      exec: this.handlerFile
+      exec: this.handlerFile,
     });
 
     // Fork the process.

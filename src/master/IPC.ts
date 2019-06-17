@@ -10,16 +10,14 @@ class IPC {
   }
 
   kill() {
-    this.workers.forEach(w => {
-      w.kill();
-    });
+    this.workers.forEach(w => w.kill());
   }
   
   send(...args: any[]): Promise<any> {
     let funcs: Promise<any>[] = [];
     this.ipcs.forEach(p => {
       funcs.push(p.send(...args));
-    })
+    });
     return Promise.race(funcs);
   }
   
