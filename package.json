@@ -1,0 +1,39 @@
+{
+  "name": "temps",
+  "version": "0.0.1",
+  "description": "A zeit style lambda runner.",
+  "main": "src/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "ss"
+  },
+  "scripts": {
+    "start": "tsc && cross-env DEBUG=tλ:* NODE_PATH=./ node ./dist/src/index.js"
+  },
+  "author": "zorbyte <zorbytee@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "directory-exists": "^2.0.1",
+    "dotenv": "^8.0.0",
+    "execa": "^1.0.0",
+    "jitson": "^1.0.0",
+    "micro": "^9.3.4",
+    "microjob": "^0.5.2",
+    "nanoid": "^2.0.3",
+    "process-as-promised": "^1.0.1",
+    "rimraf": "^2.6.3",
+    "toobusy-js": "^0.5.1",
+    "veza": "^0.5.1"
+  },
+  "devDependencies": {
+    "@types/execa": "^0.9.0",
+    "@types/micro": "^7.3.3",
+    "@types/nanoid": "^2.0.0",
+    "@types/node": "^12.0.8",
+    "@types/rimraf": "^2.0.2",
+    "@types/toobusy-js": "^0.5.2",
+    "cross-env": "^5.2.0",
+    "typescript": "^3.5.2"
+  }
+}
