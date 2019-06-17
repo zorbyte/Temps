@@ -1,10 +1,3 @@
-/**
- * Copyright (C) ConnectEx, Inc - All Rights Reserved.
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- * Written by Oscar Davies <zorbytee@gmail.com>, June 2019.
- */
-
 import { join } from "path";
 import rimraf = require("rimraf");
 import LambdaManager from "./master/LambdaManager";

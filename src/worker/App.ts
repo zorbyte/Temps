@@ -1,10 +1,3 @@
-/**
- * Copyright (C) ConnectEx, Inc - All Rights Reserved.
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- * Written by Oscar Davies <zorbytee@gmail.com>, June 2019.
- */
-
 import { globalAgent as gAgentHttps, Server as HttpsServer } from "https";
 import { globalAgent, Server, IncomingMessage, ServerResponse } from "http";
 import ProcessAsPromised = require("process-as-promised");

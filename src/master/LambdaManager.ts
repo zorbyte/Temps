@@ -1,10 +1,3 @@
-/**
- * Copyright (C) ConnectEx, Inc - All Rights Reserved.
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- * Written by Oscar Davies <zorbytee@gmail.com>, June 2019.
- */
-
 import Lambda from "./Lambda";
 import nanoid = require("nanoid");
 
