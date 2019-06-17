@@ -1,7 +1,7 @@
 <br />
 <p align="center">
   <a href="">
-    <img src="assets/Temps.png" alt="Logo" width="80" height="80">
+    <img src="assets/Temps.png" alt="Logo" width="80" height="66">
   </a>
 
   <h3 align="center">Temps</h3>
@@ -14,8 +14,10 @@
 <br>
 
 ## More info coming soon but...
-The gist of it:
-trigger a webhook that clones the repo code on /.well-known/__lambda/update
+
+<b>The gist of it (highly unorganised, sorry):</b>
+
+Trigger a webhook that clones the repo code on /.well-known/__lambda/update
 If the repo is private, supply an API key in the env file
 Works with github only right now, because of silly hard coding that needs to be fixed.
 
