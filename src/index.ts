@@ -4,7 +4,7 @@ import LambdaManager from "./master/LambdaManager";
 
 require("dotenv").config({ path: join(__dirname, "..", "..", ".env") });
 
-const debug = require("debug")("cλ:master");
+const debug = require("debug")("tλ:master");
 
 const manager = new LambdaManager();
 
