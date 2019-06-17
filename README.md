@@ -18,12 +18,12 @@
 Temps is a breeze to setup, so easy it only needs an example:
 ```js
 // An optional function (optionally async) that runs before the server listens is executed.
-exports.init = async () => {}
+exports.init = async () => { };
 
 // A required (optionally async) handler (works with export default as well).
-module.exports = async () => {
+module.exports = async (req, res) => {
   // Refer to https://github.com/zeit/micro for what you can do here!
-}
+};
 ```
 
 The dependency micro is injected therefore `require("micro")` will simply just work.
