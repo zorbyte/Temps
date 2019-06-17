@@ -15,7 +15,9 @@
 
 ## Setting up your function
 
-Temps is a breeze to setup, so easy it only needs an example:
+### Programmatic setup
+
+Temps is a breeze to setup, it's so easy it only needs an example:
 ```js
 // An optional function (optionally async) that runs before the server listens is executed.
 exports.init = async () => { };
@@ -23,11 +25,19 @@ exports.init = async () => { };
 // A required (optionally async) handler (works with export default as well).
 module.exports = async (req, res) => {
   // Refer to https://github.com/zeit/micro for what you can do here!
+  // Or run whatever http frameworks you want here!
 };
 ```
 
+Make sure to use the `main` field in your `package.json` to point to an entry point file that matches the signature of the example above.
+
 The dependency micro is injected therefore `require("micro")` will simply just work.
 If you specify a custom version in your `package.json` it will be respected. However, please ensure that the included version of micro is semver compliant with the one in use with this repository to prevent errors from external API changes.
+
+### Compiling your code
+
+Temps compiles your code by running the `lambdaBuild` script if present in your package.json.
+Please ensure that the entry point specified in the `main` field of your lambda's `package.json` points to the compiled entry point.
 
 ## Configuring Temps
 
