@@ -36,7 +36,8 @@ Temps only works with GitHub repositories momentarily due to some hard coded con
 To configure temps to work with private repositories, setup a GitHub access token with the `repos` scope checked.
 Check out `.env.example` to see how to configure your repository.
 Temps works with github webhooks with plans to support more platforms in future.
-To set it up, generate a secret for example: `require("crypto").randomBytes(32).toString("base64")` and set it to the env variable named `SECRET`. Then configure a push webhook on GitHub that uses that same secret and pushes to the following endpoint: `example.com/.well-known/__lambda/update`.
+To set it up, generate a secret for example: `require("crypto").randomBytes(32).toString("base64")` and set it to the env variable named `SECRET`.
+Then configure a push webhook on GitHub that uses that same secret and pushes to the following endpoint: `example.com/.well-known/__lambda/update`.
 
 ### Software configuration
 Refer to .env.example... it's pretty self-explanatory.
