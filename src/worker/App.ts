@@ -26,6 +26,9 @@ class App {
     // The HTTP server instance.
     this.server = credentials.key && credentials.cert ? new HttpsServer(credentials) : new Server();
 
+    // This reduces delay when accessing the socket.
+    this.server.on("connection", socket => socket.setNoDelay(true));
+
     // The request handler.
     this.server.on("request", (req, res) => {
       // Make the handler priority in the event loop for a significant performance gain.
