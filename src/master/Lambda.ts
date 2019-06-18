@@ -5,6 +5,7 @@ import { promisify } from "util";
 // FS operations.
 import rimrafCb = require("rimraf");
 import dirExists = require("directory-exists");
+import recCopy = require("recursive-copy");
 import { promises as fs } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
@@ -41,7 +42,7 @@ class Lambda {
     debug("Verifying git details.");
     this.branch = process.env.BRANCH || "master";
     if (!process.env.REPOSITORY) {
-      console.error("No Git repository provided!");
+      console.error("No repository provided!");
       process.exit();
     } else {
       this.remote = process.env.REPOSITORY;
@@ -118,9 +119,14 @@ class Lambda {
     debug(`Lambda will be built in ${folderName}`);
 
     if (!await dirExists(`${this.homeDir}/.git`)) {
-      // Clone the repository to the folder.
+      // Clone/copy the repository to the folder.
       debug(`Cloning repository...`);
-      await execa("git", ["clone", "--single-branch", "--branch", this.branch, this.remote, this.homeDir]);
+      if (process.env.LOCAL_DEV === "1") {
+        await recCopy(this.remote, this.homeDir);
+        await execa("git", ["init"], { cwd: this.homeDir });
+      } else {
+        await execa("git", ["clone", "--single-branch", "--branch", this.branch, this.remote, this.homeDir]);
+      }
 
       // Wait until it does exist.
       while (!await dirExists(`${this.homeDir}/.git`)) { /* noop */ };

@@ -26,7 +26,8 @@
 Temps is a breeze to setup, it's so easy it only needs an example:
 ```js
 // An optional function (optionally async) that runs before the server listens is executed.
-exports.init = async () => { };
+// If the argument is present, the HTTP server will be passed to init for your usage.
+exports.init = async ([server]) => { };
 
 // Also works with HTTPS!
 exports.credentials = {
@@ -35,9 +36,7 @@ exports.credentials = {
 };
 
 // A required (optionally async) handler (works with exports.default as well).
-// Optionally if there are more than 2 arguments required in this function,
-// the HTTP server instance will be passed to the third argument.
-module.exports = async (req, res, [server]) => {
+module.exports = async (req, res) => {
   // If this is an async function and you return either a string or buffer here
   // Temps will send the returned data! Async functions can still be used without this behavior.
   // You can run whatever you want in here: express, koa etc.
@@ -54,6 +53,7 @@ Please ensure that the entry point specified in the `main` field of your lambda'
 ## Configuring Temps
 
 ### Repositories
+
 To configure Temps to work with private repositories, setup a GitHub access token with the `repos` scope checked.
 Check out `.env.example` to see how to configure your repository.
 Temps works with GitHub webhooks with plans to support more platforms in future.

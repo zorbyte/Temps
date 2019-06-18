@@ -22,6 +22,7 @@
     "jitson": "^1.0.0",
     "nanoid": "^2.0.3",
     "process-as-promised": "^1.0.1",
+    "recursive-copy": "^2.0.10",
     "rimraf": "^2.6.3",
     "toobusy-js": "^0.5.1"
   },

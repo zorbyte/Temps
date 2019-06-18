@@ -3,7 +3,6 @@ import { worker } from "cluster";
 import { timingSafeEqual, createHmac } from "crypto";
 
 // This is used for types.
-import { Server } from "http";
 import TrequireDep from "./requireDep";
 import TProcAsPromised = require("process-as-promised");
 import { IncomingMessage, ServerResponse } from "http";
@@ -16,44 +15,29 @@ const requireDep: typeof TrequireDep = require(process.env.REQUIRE_FILE as strin
 
 // Injected deps.
 const ProcessAsPromised: typeof TProcAsPromised = requireDep("process-as-promised");
-const jitson: typeof Tjitson = requireDep("bl");
+const jitson: typeof Tjitson = requireDep("jitson");
+const debug = requireDep("debug")(`tλ:${worker.id}:ipc`);
 const bl: Tbl = requireDep("bl");
 
 const { default: App } = require(process.env.APP_FILE as string);
-
 const lambda = require(process.env.MAIN_FILE as string);
-const debug = requireDep("debug")(`tλ:${worker.id}:ipc`);
 
 const IPC = new ProcessAsPromised();
+const app: TApp = new App(IPC, handleRequest, lambda.credentials || {});
 
 // Run the init function if it exists.
 if (lambda.init) {
   debug("Running lambda's init function.");
-  lambda.init();
+  lambda.init(lambda.init.length >= 1 ? app.server : void 0);
 }
 
 // The run function for the lambda.
 const runFunc = lambda.default ? lambda.default : lambda;
 
-const app: TApp = new App(IPC, handleRequest, lambda.credentials || {});
-
-async function handleRequest(this: TApp, req: IncomingMessage, res: ServerResponse): Promise<void> {
+async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
   try {
     // Negative comparisons are more performant in V8.
-    if (req.url !== "/.well-known/__lambda/update") {
-      // This appears to be the fastest way to handle this.
-      let passServer: Server | undefined = void 0;
-      if (runFunc.length > 2) passServer = this.server;
-      new Promise<any>(resolve => resolve(runFunc(req, res, passServer)))
-        .catch(lambdaErr => {
-          debug("An error occurred within the supplied lambda!");
-          console.error(lambdaErr);
-          handleResult(inspect(lambdaErr), res, 500);
-        })
-        .then(result => {
-          handleResult(result, res, res.statusCode || 200);
-        });
-    } else {
+    if (req.url === "/.well-known/__lambda/update") {
       let payload: Buffer;
       if (app.secret) {
         // Create a payload from the request content.
@@ -85,8 +69,25 @@ async function handleRequest(this: TApp, req: IncomingMessage, res: ServerRespon
 
       // Updates to the new lambda.
       await IPC.send("recreate", void 0);
-      app.shouldDie = true;
-      return handleResult("{\"status\":200}", res, 200);
+      handleResult("{\"status\":200}", res, 200);
+
+      // The other thread is ready to take this ones place, it will finish the rest of the connections.
+      debug("Shutting down lambda.");
+      app.close();
+      return;
+    } else {
+      // This appears to be the fastest way to handle this.
+      new Promise<any>(resolve => resolve(runFunc(req, res)))
+        .catch(lambdaErr => {
+          debug("An error occurred within the supplied lambda!");
+          console.error(lambdaErr);
+          handleResult(inspect(lambdaErr), res, 500);
+        })
+        .then(async result => {
+          if (res.finished) return;
+          if (result instanceof Promise) result = await result;
+          handleResult(result, res, res.statusCode || 200);
+        });
     }
   } catch (err) {
     debug("An error occurred while handling a request!");
@@ -107,8 +108,10 @@ async function createRaw(req: IncomingMessage): Promise<Buffer> {
 
 function handleResult(result: string | Buffer, res: ServerResponse, statusCode = 200): void {
   if (result !== void 0) {
-    if (typeof result === "string") res.setHeader("Content-Length", Buffer.byteLength(result));
-    if (Buffer.isBuffer(result)) res.setHeader("Content-Length", result.length);
+    if (!res.headersSent) {
+      if (typeof result === "string") res.setHeader("Content-Length", Buffer.byteLength(result));
+      if (Buffer.isBuffer(result)) res.setHeader("Content-Length", result.length);
+    }
     res.statusCode = statusCode;
     res.end(result);
   }
