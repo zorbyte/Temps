@@ -117,8 +117,9 @@ class Lambda {
       // Add required dependencies for bridging the two apps.
       this.addDependency("process-as-promised");
       this.addDependency("toobusy-js");
-      this.addDependency("micro");
+      this.addDependency("jitson");
       this.addDependency("debug");
+      this.addDependency("bl");
 
       // Commit these changes.
       await fs.writeFile(pkgDir, JSON.stringify(this.pkg));

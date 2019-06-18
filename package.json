@@ -13,22 +13,20 @@
   "author": "zorbyte <zorbytee@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "bl": "^3.0.0",
     "debug": "^4.1.1",
     "directory-exists": "^2.0.1",
     "dotenv": "^8.0.0",
     "execa": "^1.0.0",
     "jitson": "^1.0.0",
-    "micro": "^9.3.4",
-    "microjob": "^0.5.2",
     "nanoid": "^2.0.3",
     "process-as-promised": "^1.0.1",
     "rimraf": "^2.6.3",
-    "toobusy-js": "^0.5.1",
-    "veza": "^0.5.1"
+    "toobusy-js": "^0.5.1"
   },
   "devDependencies": {
+    "@types/bl": "^2.1.0",
     "@types/execa": "^0.9.0",
-    "@types/micro": "^7.3.3",
     "@types/nanoid": "^2.0.0",
     "@types/node": "^12.0.8",
     "@types/rimraf": "^2.0.2",

@@ -2,7 +2,6 @@ import { globalAgent as gAgentHttps, Server as HttpsServer } from "https";
 import { globalAgent, Server, IncomingMessage, ServerResponse } from "http";
 import ProcessAsPromised = require("process-as-promised");
 import tooBusy = require("toobusy-js");
-import { run } from "micro";
 import { worker } from "cluster";
 
 type TReqHandler = (req: IncomingMessage, res: ServerResponse) => any;
@@ -28,10 +27,10 @@ class App {
     this.server = credentials.key && credentials.cert ? new HttpsServer(credentials) : new Server();
 
     // The request handler.
-    this.server.on("request", (firstReq, firstRes) => {
+    this.server.on("request", (req, res) => {
       // Make the handler priority in the event loop for a significant performance gain.
       setImmediate(async () => {
-        await run(firstReq, firstRes, completeReq);
+       await completeReq(req, res);
 
         if (this.shouldDie) {
           debug("Shutting down lambda.");

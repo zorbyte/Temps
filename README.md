@@ -17,6 +17,7 @@
 
 - Temps can automatically hot swap your functions to an updated version without any dramas. This is achieved through GitHub webhooks.
 - Temps auto-scales your lambda function, whenever it detects a large amount of load in the event loop it creates a new thread to spread the load on.
+- Lightning fast, responds in under 5ms for a hello world async function!
 
 ## Setting up your function
 
@@ -29,15 +30,15 @@ exports.init = async () => { };
 
 // A required (optionally async) handler (works with export default as well).
 module.exports = async (req, res) => {
-  // Refer to https://github.com/zeit/micro for what you can do here!
-  // Or run whatever http frameworks you want here!
+  // If this is an async function and you return either a string or buffer here
+  // Temps will send the returned data! Async functions can still be used without this behavior.
+  // You can run whatever you want in here: express, koa etc.
 };
 ```
 
 Make sure to use the `main` field in your `package.json` to point to an entry point file that matches the signature of the example above.
 
-Since the dependency `micro` is injected, `require("micro")` will simply just work.
-If you specify a custom version in your `package.json` it will be respected. However, please ensure that the included version of micro is semver compliant with the major version of the one in use with this repository, to prevent errors from external API changes.
+Five dependencies are injected into your lambda with Temps: `toobusy-js`, `jitson`, `debug`, `bl` and `process-as-promised`. This allows certain functionality to work correctly. Requiring these modules will function without adding them to your `package.json`. If you specify a different version of this module, it will be respected but please be aware that packages that differs in major version may have incompatible API changes with the version running within Temps.
 
 ### Compiling your code
 
