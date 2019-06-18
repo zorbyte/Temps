@@ -25,13 +25,6 @@ const debug = requireDep("debug")(`tλ:${worker.id}:ipc`);
 
 const IPC = new ProcessAsPromised();
 
-// When the function has been recreated.
-IPC.on("recreateDone", (exitCode: number, callback: () => {}) => {
-  app.close();
-  callback();
-  process.exit(exitCode);
-});
-
 // Run the init function if it exists.
 if (lambda.init) {
   debug("Running lambda's init function.");

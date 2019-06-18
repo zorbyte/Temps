@@ -28,6 +28,12 @@ Temps is a breeze to setup, it's so easy it only needs an example:
 // An optional function (optionally async) that runs before the server listens is executed.
 exports.init = async () => { };
 
+// Also works with HTTPS!
+exports.credentials = {
+  key,
+  cert,
+};
+
 // A required (optionally async) handler (works with export default as well).
 module.exports = async (req, res) => {
   // If this is an async function and you return either a string or buffer here

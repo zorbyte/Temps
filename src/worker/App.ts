@@ -46,6 +46,7 @@ class App {
       if (this.shouldDie) {
         debug("Shutting down lambda.");
         this.close();
+        tooBusy.shutdown();
       }
 
       // Scales the function if required.
