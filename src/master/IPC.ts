@@ -6,7 +6,7 @@ class IPC {
   public ipcs: typeof ProcessAsPromised[] = [];
 
   push(worker: Worker) {
-    this.workers.push(new ProcessAsPromised(worker));
+    this.ipcs.push(new ProcessAsPromised(worker));
   }
 
   kill() {
@@ -22,7 +22,7 @@ class IPC {
   }
   
   on(...args: any[]) {
-    this.ipcs.forEach(p => p.on(...args));
+    this.ipcs.forEach(async p => await p.on(...args));
   }
 }
 

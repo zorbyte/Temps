@@ -25,6 +25,7 @@ class Lambda {
   private appFile!: string;
   private pkg: any;
   private ipc = new IPC();
+  private dontSpawn = true;
 
   // Internals.
   private onReadyFn!: TOnReadyFunc;
@@ -55,12 +56,15 @@ class Lambda {
       console.error(err);
     }).then(() => {
       this.ipc.on("recreate", this.recreate);
-      this.ipc.on("scale", this.spawn);
+      this.ipc.on("scale", (_: any, callback: () => {}) => {
+        this.spawn();
+        callback();
+      });
     });
   }
 
   /* Adds a dependency to the lambda's package.json */
-  private addDependency(name: string) {
+  private addDependency(name: string): void {
     this.pkg.dependencies[name] = this.pkg.dependencies[name]
       ? this.pkg.dependencies[name]
       // @ts-ignore Typescript doesn't like this.
@@ -68,7 +72,11 @@ class Lambda {
   }
 
   /* Spawns the lambda package.json */
-  private spawn() {
+  private spawn(firstSpawn = false): void {
+    // Stops the function from being called twice.
+    this.dontSpawn = !this.dontSpawn;
+    if (!firstSpawn && this.dontSpawn) return;
+
     let proc = fork({
       "PORT": process.env.PORT as string,
       "BRANCH": this.branch,
@@ -81,7 +89,7 @@ class Lambda {
     this.ipc.push(proc);
   }
 
-  private async buildLambda() {
+  private async buildLambda(): Promise<void> {
     // The name of the temp folder.
     const folderName = `tmp-clone-${this.repositoryName
       .replace(".git", "")
@@ -161,17 +169,17 @@ class Lambda {
     });
 
     // Fork the process.
-    this.spawn();
+    this.spawn(true);
 
     debug("Lambda is ready!");
     await this.onReadyFn();
   }
 
-  public onReady(fn: TOnReadyFunc = () => { }) {
+  public onReady(fn: TOnReadyFunc = () => { }): void {
     this.onReadyFn = fn;
   }
 
-  public async recreate() {
+  public async recreate(): Promise<void> {
     try {
       debug("Updating to new lambda.");
       await this.manager.create();

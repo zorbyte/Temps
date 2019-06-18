@@ -29,17 +29,19 @@ class App {
     // The request handler.
     this.server.on("request", (req, res) => {
       // Make the handler priority in the event loop for a significant performance gain.
-      setImmediate(async () => {
-       await completeReq(req, res);
+      setImmediate(() => completeReq(req, res));
 
-        if (this.shouldDie) {
-          debug("Shutting down lambda.");
-          process.exit();
-        }
+      // After the request was handled, if the lambda is set to die, kill it.
+      if (this.shouldDie) {
+        debug("Shutting down lambda.");
+        process.exit();
+      }
 
-        // Scales the function if required.
-        if (tooBusy()) await this.IPC.send("scale");
-      });
+      // Scales the function if required.
+      let testScaling = process.env.NODE_ENV !== "production"
+        && process.env.TEST_SCALE === "1"
+        && req.url !== "favicon.ico";
+      if (testScaling || tooBusy()) this.IPC.send("scale");
     });
   }
 

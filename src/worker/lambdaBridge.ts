@@ -1,5 +1,6 @@
 import ProcessAsPromised = require("process-as-promised");
 import { IncomingMessage, ServerResponse } from "http";
+import { inspect } from "util";
 import { worker } from "cluster";
 import bl = require("bl");
 import jitson = require("jitson");
@@ -32,12 +33,24 @@ const app: AppClazz = new App(IPC, handleRequest, lambda.credentials || {});
 
 async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
   try {
-    if (req.url === "/.well-known/__lambda/update") {
+    // Negative comparisons are more performant in V8.
+    if (req.url !== "/.well-known/__lambda/update") {
+      // This appears to be the fastest way to handle this.
+      new Promise<any>(resolve => resolve(runFunc(req, res)))
+        .catch(lambdaErr => {
+          debug("An error occurred within the supplied lambda!");
+          console.error(lambdaErr);
+          handleResult(inspect(lambdaErr), res, 500);
+        })
+        .then(result => {
+          handleResult(result, res, res.statusCode || 200);
+        });
+    } else {
       debug("Verifying webhook signature.");
       const checksum = req.headers["x-hub-signature"];
 
       // Verify if header was provided.
-      if (!checksum) return await handleResult("Signature not provided", res, 401, true);
+      if (!checksum) return await handleResult("Signature not provided", res, 401);
 
       // Create a payload from the request content.
       const payload = await new Promise<Buffer>((ok, fail) => {
@@ -54,31 +67,24 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
         .digest("hex");
       const verif = crypto
         .timingSafeEqual(Buffer.from(`sha1=${sig}`), Buffer.from(checksum as string));
-      if (!verif) return await handleResult("Invalid signature", res, 401, true);
+      if (!verif) return await handleResult("Invalid signature", res, 401);
       const body = jitson(payload.toString());
-      if (body.ref.indexOf(process.env.BRANCH) <= -1) return await handleResult("Invalid branch", res, 403, true);
+      if (body.ref.indexOf(process.env.BRANCH) <= -1) return handleResult("Invalid branch", res, 403);
 
       // Updates to the new lambda.
       await IPC.send("recreate");
       app.shouldDie = true;
-      return await handleResult("{\"status\":200}", res, 200, true);
-    } else {
-      let result = runFunc(req, res);
-      return await handleResult(result, res, res.statusCode || 200);
+      return handleResult("{\"status\":200}", res, 200);
     }
-  } catch (lambdaErr) {
+  } catch (err) {
     debug("An error occurred while handling a request!");
-    console.error(lambdaErr);
-    await handleResult(lambdaErr.message, res, 500, true);
+    console.error(err);
+    handleResult(err.message, res, 500);
   }
 };
 
-async function handleResult(result: any, res: ServerResponse, statusCode = 200, handle = false): Promise<void> {
-  if (result instanceof Promise) {
-    result = await result;
-    handle = true;
-  }
-  if (handle && result !== void 0) {
+function handleResult(result: string | Buffer, res: ServerResponse, statusCode = 200): void {
+  if (result !== void 0) {
     if (typeof result === "string") res.setHeader("Content-Length", Buffer.byteLength(result));
     if (Buffer.isBuffer(result)) res.setHeader("Content-Length", result.length);
     res.statusCode = statusCode;

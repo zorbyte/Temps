@@ -8,7 +8,7 @@ const debug = require("debug")("tλ:master");
 
 const manager = new LambdaManager();
 
-debug("Creating lambda manager.");
+debug("Configuring lambda manager...");
 manager.create()
   .catch(console.error)
   .then(() => {
