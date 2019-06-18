@@ -34,7 +34,7 @@ class App {
         await run(firstReq, firstRes, completeReq);
 
         if (this.shouldDie) {
-          debug("Shutting down lambda.")
+          debug("Shutting down lambda.");
           process.exit();
         }
 
