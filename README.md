@@ -34,7 +34,7 @@ exports.credentials = {
   cert,
 };
 
-// A required (optionally async) handler (works with export default as well).
+// A required (optionally async) handler (works with exports.default as well).
 module.exports = async (req, res) => {
   // If this is an async function and you return either a string or buffer here
   // Temps will send the returned data! Async functions can still be used without this behavior.
