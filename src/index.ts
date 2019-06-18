@@ -2,7 +2,7 @@ import { join } from "path";
 import rimraf = require("rimraf");
 import LambdaManager from "./master/LambdaManager";
 
-require("dotenv").config({ path: join(__dirname, "..", "..", ".env") });
+require("dotenv").config({ path: join(__dirname, "..", ".env") });
 
 const debug = require("debug")("tλ:master");
 

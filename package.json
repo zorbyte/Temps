@@ -8,8 +8,8 @@
     "url": "ss"
   },
   "scripts": {
-    "start": "tsc && cross-env NODE_ENV=production node ./dist/src/index.js",
-    "start:dev": "tsc && cross-env DEBUG=tλ:* NODE_ENV=development node ./dist/src/index.js"
+    "start": "tsc && cross-env NODE_ENV=production node ./dist/index.js",
+    "start:dev": "tsc && cross-env DEBUG=tλ:* NODE_ENV=development node ./dist/index.js"
   },
   "author": "zorbyte <zorbytee@gmail.com>",
   "license": "MIT",

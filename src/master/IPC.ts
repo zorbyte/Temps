@@ -18,11 +18,11 @@ class IPC {
     this.ipcs.forEach(p => {
       funcs.push(p.send(...args));
     });
-    return Promise.race(funcs);
+    return Promise.all(funcs);
   }
   
   on(...args: any[]) {
-    this.ipcs.forEach(async p => await p.on(...args));
+    this.ipcs.map(p => p.on(...args));
   }
 }
 

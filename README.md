@@ -38,8 +38,6 @@ module.exports = async (req, res) => {
 
 Make sure to use the `main` field in your `package.json` to point to an entry point file that matches the signature of the example above.
 
-Five dependencies are injected into your lambda with Temps: `toobusy-js`, `jitson`, `debug`, `bl` and `process-as-promised`. This allows certain functionality to work correctly. Requiring these modules will function without adding them to your `package.json`. If you specify a different version of this module, it will be respected but please be aware that packages that differs in major version may have incompatible API changes with the version running within Temps.
-
 ### Compiling your code
 
 Temps compiles your code by running the `lambdaBuild` script if present in your package.json.
@@ -48,7 +46,6 @@ Please ensure that the entry point specified in the `main` field of your lambda'
 ## Configuring Temps
 
 ### Repositories
-Temps only works with GitHub repositories momentarily due to some hard coded configurations that will be fixed soon.
 To configure temps to work with private repositories, setup a GitHub access token with the `repos` scope checked.
 Check out `.env.example` to see how to configure your repository.
 Temps works with github webhooks with plans to support more platforms in future.

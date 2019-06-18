@@ -1,21 +1,29 @@
 import { globalAgent as gAgentHttps, Server as HttpsServer } from "https";
 import { globalAgent, Server, IncomingMessage, ServerResponse } from "http";
-import ProcessAsPromised = require("process-as-promised");
-import tooBusy = require("toobusy-js");
 import { worker } from "cluster";
+
+// Types.
+import TrequireDep from "./requireDep";
+import TProcAsPromised = require("process-as-promised");
+import TtooBusy = require("toobusy-js")
+
+// For dependency injection.
+const requireDep: typeof TrequireDep = require(process.env.REQUIRE_FILE as string).default;
+
+const tooBusy: typeof TtooBusy = requireDep("toobusy-js");
 
 type TReqHandler = (req: IncomingMessage, res: ServerResponse) => any;
 
-const debug = require("debug")(`tλ:${worker.id}:app`);
+const debug = requireDep("debug")(`tλ:${worker.id}:app`);
 
 class App {
   private server: Server | HttpsServer;
-  public secret: string;
+  public secret?: string;
   public shouldDie = false;
 
-  constructor(private IPC: typeof ProcessAsPromised, completeReq: TReqHandler, credentials: { key?: string, cert?: string } = {}) {
+  constructor(private IPC: typeof TProcAsPromised, completeReq: TReqHandler, credentials: { key?: string, cert?: string } = {}) {
     // Configure constants.
-    this.secret = process.env.SECRET || "TEST";
+    this.secret = process.env.SECRET;
 
     debug("Configuring HTTP server.");
 
@@ -37,7 +45,7 @@ class App {
       // After the request was handled, if the lambda is set to die, kill it.
       if (this.shouldDie) {
         debug("Shutting down lambda.");
-        process.exit();
+        this.close();
       }
 
       // Scales the function if required.

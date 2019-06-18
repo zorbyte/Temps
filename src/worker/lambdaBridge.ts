@@ -1,16 +1,27 @@
-import ProcessAsPromised = require("process-as-promised");
-import { IncomingMessage, ServerResponse } from "http";
 import { inspect } from "util";
 import { worker } from "cluster";
-import bl = require("bl");
-import jitson = require("jitson");
-import crypto = require("crypto");
-import AppClazz from "./App";
+import { timingSafeEqual, createHmac } from "crypto";
+
+// This is used for types.
+import TrequireDep from "./requireDep";
+import TProcAsPromised = require("process-as-promised");
+import { IncomingMessage, ServerResponse } from "http";
+import Tbl = require("bl");
+import Tjitson = require("jitson");
+import TApp from "./App";
+
+// For dependency injection.
+const requireDep: typeof TrequireDep = require(process.env.REQUIRE_FILE as string).default;
+
+// Injected deps.
+const ProcessAsPromised: typeof TProcAsPromised = requireDep("process-as-promised");
+const jitson: typeof Tjitson = requireDep("bl");
+const bl: Tbl = requireDep("bl");
 
 const { default: App } = require(process.env.APP_FILE as string);
 
 const lambda = require(process.env.MAIN_FILE as string);
-const debug = require("debug")(`tλ:${worker.id}:ipc`);
+const debug = requireDep("debug")(`tλ:${worker.id}:ipc`);
 
 const IPC = new ProcessAsPromised();
 
@@ -27,9 +38,10 @@ if (lambda.init) {
   lambda.init();
 }
 
+// The run function for the lambda.
 const runFunc = lambda.default ? lambda.default : lambda;
 
-const app: AppClazz = new App(IPC, handleRequest, lambda.credentials || {});
+const app: TApp = new App(IPC, handleRequest, lambda.credentials || {});
 
 async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
   try {
@@ -46,33 +58,37 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
           handleResult(result, res, res.statusCode || 200);
         });
     } else {
-      debug("Verifying webhook signature.");
-      const checksum = req.headers["x-hub-signature"];
+      let payload: Buffer;
+      if (app.secret) {
+        // Create a payload from the request content.
+        payload = await createRaw(req);
+      } else {
+        debug("Verifying webhook signature.");
+        const checksum = req.headers["x-hub-signature"];
 
-      // Verify if header was provided.
-      if (!checksum) return await handleResult("Signature not provided", res, 401);
+        // Verify if header was provided.
+        if (!checksum) return await handleResult("Signature not provided", res, 401);
 
-      // Create a payload from the request content.
-      const payload = await new Promise<Buffer>((ok, fail) => {
-        // @ts-ignore This is typed incorrectly in the module.
-        req.pipe(bl((err: Error, data: Buffer) => {
-          if (err) fail(err);
-          ok(data);
-        }));
-      });
+        // Create a payload from the request content.
+        payload = await createRaw(req);
 
-      // Verify the signiture.
-      const sig = crypto.createHmac("sha1", app.secret)
-        .update(payload)
-        .digest("hex");
-      const verif = crypto
-        .timingSafeEqual(Buffer.from(`sha1=${sig}`), Buffer.from(checksum as string));
-      if (!verif) return await handleResult("Invalid signature", res, 401);
+        // Verify the signiture.
+        const sig = createHmac("sha1", app.secret as string)
+          .update(payload)
+          .digest("hex");
+        const verified = timingSafeEqual(
+          Buffer.from(`sha1=${sig}`),
+          Buffer.from(checksum as string),
+        );
+        if (!verified) return await handleResult("Invalid signature", res, 401);
+      }
+
+      // Parse the body as JSON if it is correct.
       const body = jitson(payload.toString());
-      if (body.ref.indexOf(process.env.BRANCH) <= -1) return handleResult("Invalid branch", res, 403);
+      if (body.ref && body.ref.indexOf(process.env.BRANCH) <= -1) return handleResult("Invalid branch", res, 403);
 
       // Updates to the new lambda.
-      await IPC.send("recreate");
+      await IPC.send("recreate", void 0);
       app.shouldDie = true;
       return handleResult("{\"status\":200}", res, 200);
     }
@@ -82,6 +98,16 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
     handleResult(err.message, res, 500);
   }
 };
+
+async function createRaw(req: IncomingMessage): Promise<Buffer> {
+  return await new Promise<Buffer>((ok, fail) => {
+    // @ts-ignore This is typed incorrectly in the module.
+    req.pipe(bl((err: Error, data: Buffer) => {
+      if (err) fail(err);
+      ok(data);
+    }));
+  });
+}
 
 function handleResult(result: string | Buffer, res: ServerResponse, statusCode = 200): void {
   if (result !== void 0) {
