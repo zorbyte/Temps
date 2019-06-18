@@ -58,6 +58,7 @@ class App {
 
   public close(callback?: (err?: Error) => {}) {
     this.server.close(callback);
+    tooBusy.shutdown();
   }
 }
 

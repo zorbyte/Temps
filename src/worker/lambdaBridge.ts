@@ -13,8 +13,9 @@ const debug = require("debug")(`tλ:${worker.id}:ipc`);
 const IPC = new ProcessAsPromised();
 
 // When the function has been recreated.
-IPC.on("recreateDone", (exitCode: number) => {
+IPC.on("recreateDone", (exitCode: number, callback: () => {}) => {
   app.close();
+  callback();
   process.exit(exitCode);
 });
 
