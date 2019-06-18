@@ -17,7 +17,7 @@ type TReqHandler = (req: IncomingMessage, res: ServerResponse) => any;
 const debug = requireDep("debug")(`tλ:${worker.id}:app`);
 
 class App {
-  private server: Server | HttpsServer;
+  protected server: Server | HttpsServer;
   public secret?: string;
   public shouldDie = false;
 
@@ -40,7 +40,7 @@ class App {
     // The request handler.
     this.server.on("request", (req, res) => {
       // Make the handler priority in the event loop for a significant performance gain.
-      setImmediate(() => completeReq(req, res));
+      setImmediate(() => completeReq.bind(this, req, res));
 
       // After the request was handled, if the lambda is set to die, kill it.
       if (this.shouldDie) {

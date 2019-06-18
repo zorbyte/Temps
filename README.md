@@ -35,7 +35,9 @@ exports.credentials = {
 };
 
 // A required (optionally async) handler (works with exports.default as well).
-module.exports = async (req, res) => {
+// Optionally if there are more than 2 arguments required in this function,
+// the HTTP server instance will be passed to the third argument.
+module.exports = async (req, res, [server]) => {
   // If this is an async function and you return either a string or buffer here
   // Temps will send the returned data! Async functions can still be used without this behavior.
   // You can run whatever you want in here: express, koa etc.

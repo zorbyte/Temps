@@ -158,6 +158,7 @@ class Lambda {
     debug("Running init function for lambda.");
 
     setupMaster({
+      stdio: "inherit",
       // @ts-ignore This is supported by node now.
       cwd: this.homeDir,
       exec: this.bridgeFile,

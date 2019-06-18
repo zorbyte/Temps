@@ -3,6 +3,7 @@ import { worker } from "cluster";
 import { timingSafeEqual, createHmac } from "crypto";
 
 // This is used for types.
+import { Server } from "http";
 import TrequireDep from "./requireDep";
 import TProcAsPromised = require("process-as-promised");
 import { IncomingMessage, ServerResponse } from "http";
@@ -36,12 +37,14 @@ const runFunc = lambda.default ? lambda.default : lambda;
 
 const app: TApp = new App(IPC, handleRequest, lambda.credentials || {});
 
-async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
+async function handleRequest(this: TApp, req: IncomingMessage, res: ServerResponse): Promise<void> {
   try {
     // Negative comparisons are more performant in V8.
     if (req.url !== "/.well-known/__lambda/update") {
       // This appears to be the fastest way to handle this.
-      new Promise<any>(resolve => resolve(runFunc(req, res)))
+      let passServer: Server | undefined = void 0;
+      if (runFunc.length > 2) passServer = this.server;
+      new Promise<any>(resolve => resolve(runFunc(req, res, passServer)))
         .catch(lambdaErr => {
           debug("An error occurred within the supplied lambda!");
           console.error(lambdaErr);
