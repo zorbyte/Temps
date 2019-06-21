@@ -15,10 +15,13 @@
   "license": "MIT",
   "dependencies": {
     "bl": "^3.0.0",
+    "catch-decorator": "^2.0.0",
     "debug": "^4.1.1",
     "directory-exists": "^2.0.1",
     "dotenv": "^8.0.0",
+    "errors": "^0.3.0",
     "execa": "^1.0.0",
+    "fs-nextra": "^0.4.5",
     "jitson": "^1.0.0",
     "nanoid": "^2.0.3",
     "process-as-promised": "^1.0.1",
@@ -28,6 +31,7 @@
   },
   "devDependencies": {
     "@types/bl": "^2.1.0",
+    "@types/debug": "^4.1.4",
     "@types/execa": "^0.9.0",
     "@types/nanoid": "^2.0.0",
     "@types/node": "^12.0.8",

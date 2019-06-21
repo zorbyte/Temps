@@ -11,9 +11,9 @@ import { tmpdir } from "os";
 import { join } from "path";
 
 // Managers
-import LambdaManager from "./LambdaManager.js";
+import LambdaManager from "./LambdaManager";
 import IPC from "./IPC";
-import { DEPENDENCIES } from "../constants.js";
+import { DEPENDENCIES } from "../../lib/constants";
 
 type TOnReadyFunc = () => void | any;
 
@@ -85,9 +85,9 @@ class Lambda {
 
   private async copyFiles() {
     const fileList = [
-      ["../worker/lambdaBridge.js", this.bridgeFile],
-      ["../worker/App.js", this.appFile],
-      ["../worker/requireDep.js", this.requireFile],
+      ["../_Lambda/lambdaBridge.js", this.bridgeFile],
+      ["../_Lambda/App.js", this.appFile],
+      ["../_Lambda/requireDep.js", this.requireFile],
     ];
 
     await Promise.all(

@@ -7,7 +7,7 @@
   <h3 align="center">Temps</h3>
 
   <p align="center">
-    A serverless lambda runner, inspired by zeit now.
+   λ A selfhostable serverless function runtime. Inspired by zeit now.
   </p>
 </p>
 
@@ -63,3 +63,18 @@ Then configure a push webhook on GitHub that uses that same secret and pushes to
 
 ### Software configuration
 Refer to .env.example... it's pretty self-explanatory.
+
+## Terminologies/Structure
+
+> Note: I am still working on changing everything to this uniform terminology in the program.
+
+```
+- Master - The process manager, owns a set of clusters, which is just workers grouped together.
+  - Cluster - 
+```
+
+In the context of this a few terms have some definitions:
+- Master - The master process to manager the Runtime.
+- Runtime - The runtime for the function's execution, in this project these are the cluster workers.
+- Lambda - One of the workers. Also serves as the custom HTTP framework and is figuratively tantamount to express.
+- Function - The function provided by the user.
