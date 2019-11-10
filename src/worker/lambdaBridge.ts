@@ -36,7 +36,6 @@ const runFunc = lambda.default ? lambda.default : lambda;
 
 async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
   try {
-    // Negative comparisons are more performant in V8.
     if (req.url === "/.well-known/__lambda/update") {
       let payload: Buffer;
       if (app.secret) {
